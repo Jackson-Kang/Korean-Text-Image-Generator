@@ -8,7 +8,6 @@ class Dir_Module:
     save_dir = ''
 
     def __init__(self, dirname):
-        print("d")
 
         self.dirname = dirname
         self.generated_img_dir = self.dirname + '/generated_img_data'
@@ -20,7 +19,7 @@ class Dir_Module:
 
         for root, dirs, files in os.walk(self.dirname):
              for directory in dirs:
-                os.chmod(root + '/' + directory,stat.S_IWRITE)
+                os.chmod(root + '/' + directory, 0755)
         # create dir structure
 
     def _create_dir(self, dirname):
