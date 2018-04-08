@@ -19,7 +19,7 @@ class Dir_Module:
 
         for root, dirs, files in os.walk(self.dirname):
              for directory in dirs:
-                os.chmod(root + '/' + directory, 0755)
+                os.chmod(root + '/' + directory, 0o755)
         # create dir structure
 
     def _create_dir(self, dirname):
