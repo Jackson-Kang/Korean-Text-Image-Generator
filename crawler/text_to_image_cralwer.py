@@ -7,7 +7,7 @@
     Text to Image Data Generator (used NAVER OPEN API)
 
     March, 27, 2018
-    
+        
 '''
 
 # meta data 정보 작성
