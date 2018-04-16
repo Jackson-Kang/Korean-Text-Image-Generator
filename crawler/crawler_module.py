@@ -94,6 +94,7 @@ class Crawler_Module:
 
         whole_string = self._tag_converter("".join(string_list), "\n\n", " ")
         whole_string = self._tag_converter(whole_string, "\n", " ")
+        whole_string = self._tag_converter(whole_string, "/", "")
         temp_list = whole_string.split(" ")
 
         for word in temp_list:
