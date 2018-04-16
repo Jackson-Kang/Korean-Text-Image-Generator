@@ -61,7 +61,7 @@ if __name__ == "__main__":
             print(user_input)
             print("     complete..!")
 
-            print("\n" + step + "image generating..")
+            print("\n" + step + "th image generating..")
             generator_instance.img_generator_10(crawled_list, user_input)
             print("     complete..!")
             print("\n")

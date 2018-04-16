@@ -61,7 +61,7 @@ class Image_Generator:
             for image_count in range(len(string_tuple)):
                 # (width, height) tuple: string_tuple[image_count][1]
                 image_width = string_tuple[image_count][1][0] + 20
-                image_height = string_tuple[image_count][1][1] - self.font_size * 11
+                image_height = string_tuple[image_count][1][1] - self.font_size * 12
 
                 image_frame = Image.new("RGB", (image_width, image_height), rgb_tuple)
                 generated_img = ImageDraw.Draw(image_frame)
