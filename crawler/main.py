@@ -58,7 +58,6 @@ if __name__ == "__main__":
             print("\n" + step + "th crawling..")
             crawled_list = crawler_instance.crawler()
             user_input = crawler_instance.find_less_crawled_element(crawled_list)
-            print(user_input)
             print("     complete..!")
 
             print("\n" + step + "th image generating..")
