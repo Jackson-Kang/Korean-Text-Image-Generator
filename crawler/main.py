@@ -56,14 +56,22 @@ if __name__ == "__main__":
             step = str(repetition_count + 1)
 
             print("\n" + step + "th crawling..")
-            crawled_list = crawler_instance.crawler()
-            user_input = crawler_instance.find_less_crawled_element(crawled_list)
-            print("     complete..!")
+            crawled_result = crawler_instance.crawler()
 
-            print("\n" + step + "th image generating..")
-            generator_instance.img_generator_10(crawled_list, user_input)
-            print("     complete..!")
-            print("\n")
+            if crawled_result != -1:
+                print("     complete..!")
+
+                print("\n" + step + "th image generating..")
+                generator_instance.img_generator_10(crawled_result, user_input)
+                print("     complete..!")
+
+                user_input = crawler_instance.find_less_crawled_element(crawled_result)
+
+                print("\n")
+            else:
+                print("Crawler Error: " + str(crawled_result[1]))
+                print("     Terminated..")
+                break
 
         else:
             break

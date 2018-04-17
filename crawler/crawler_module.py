@@ -33,38 +33,43 @@ class Crawler_Module:
         }
 
         req = urllib.request.Request(fullURL, headers=headers)
-        xml_code = urllib.request.urlopen(req)
+        response = urllib.request.urlopen(req)
         # request to API Server
 
-        result_XML = xml_code.read()
-        parsed_XML = BeautifulSoup(result_XML, 'lxml-xml')
-        items = parsed_XML.find_all('item')
+        status_code = response.getcode()
 
-        result_list = []
+        if status_code == 200:
 
-        count = 1
+            result_XML = response.read()
+            parsed_XML = BeautifulSoup(result_XML, 'lxml-xml')
+            items = parsed_XML.find_all('item')
 
-        for item in items:
-            title = self._strip_tag(item.title.get_text(strip=True))
-            description = self._strip_tag(item.description.get_text(strip=True))
-            temp_description = ""
-            temp_list = []
+            result_list = []
 
-            for char in description:
-                temp_list.append(char)
+            count = 1
 
-            for char in temp_list:
-                temp_description = temp_description + char
+            for item in items:
+                title = self._strip_tag(item.title.get_text(strip=True))
+                description = self._strip_tag(item.description.get_text(strip=True))
+                temp_description = ""
+                temp_list = []
 
-            if count%10 == 0:
-                temp_string = title + "\n" + temp_description
-            else:
-                temp_string = title + "\n" + temp_description + "\n\n"
+                for char in description:
+                    temp_list.append(char)
 
-            result_list.append(temp_string)
+                for char in temp_list:
+                    temp_description = temp_description + char
 
+                if count%10 == 0:
+                    temp_string = title + "\n" + temp_description
+                else:
+                    temp_string = title + "\n" + temp_description + "\n\n"
 
-        return result_list
+                result_list.append(temp_string)
+            return result_list
+
+        else:
+            return (-1, str(status_code))
 
     # return a parsed crawling results
 
