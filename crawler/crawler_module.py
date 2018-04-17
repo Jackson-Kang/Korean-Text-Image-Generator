@@ -69,7 +69,8 @@ class Crawler_Module:
             return result_list
 
         else:
-            return (-1, str(status_code))
+            print("Crawler Error: " + str(status_code))
+            return -1
 
     # return a parsed crawling results
 

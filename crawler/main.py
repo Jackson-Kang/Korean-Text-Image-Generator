@@ -69,7 +69,6 @@ if __name__ == "__main__":
 
                 print("\n")
             else:
-                print("Crawler Error: " + str(crawled_result[1]))
                 print("     Terminated..")
                 break
 
