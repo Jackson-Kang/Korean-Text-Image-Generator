@@ -10,6 +10,7 @@ class Dir_Module:
     font_dir = ''
     save_dir = ''
     user_input = ""
+    json_path = ""
 
     def __init__(self, dirname):
 
@@ -17,6 +18,8 @@ class Dir_Module:
         self.generated_img_dir = self.dirname + '/generated_img_data'
         self.font_dir = self.dirname + '/fonts'
         self.generated_img_dir_list = []
+
+        self.json_path = "./data/generated_img_data/desc.json"
 
         self._create_dir(self.dirname)
         self._create_dir(self.generated_img_dir)
@@ -65,10 +68,15 @@ class Dir_Module:
     def get_save_dir_list(self):
         return self.generated_img_dir_list
 
+    def get_json_file_path(self):
+        return self.json_path
+
     def set_user_input(self, user_input):
         self.user_input = user_input
 
     def set_save_dir(self, dirname):
         self.save_dir = dirname
-
         # user-defined accessor
+
+    def is_json_exists(self):
+        return os.path.isfile(self.json_path)

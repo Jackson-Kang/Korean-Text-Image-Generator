@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from PIL import Image, ImageDraw, ImageFont
+import json
 
 class Image_Generator:
 
     dir_instance = ""
     font_size  = 15
+
 
     def __init__(self, dir_instance):
         self.dir_instance = dir_instance
@@ -47,6 +49,8 @@ class Image_Generator:
 
     def img_generator_10(self, string_list, user_input):
 
+        img_name_list = []
+
         start_x_pos = 10
         start_y_pos = 10
         # set position of letters
@@ -58,6 +62,7 @@ class Image_Generator:
             font_type = ImageFont.truetype(self.dir_instance.get_font_dir() + "/" + self.dir_instance.get_font_list()[font_count], self.font_size)
             string_tuple = self._string_joiner(string_list, self.dir_instance.get_font_list()[font_count])
 
+
             for image_count in range(len(string_tuple)):
                 # (width, height) tuple: string_tuple[image_count][1]
                 image_width = string_tuple[image_count][1][0] + 20
@@ -65,8 +70,22 @@ class Image_Generator:
 
                 image_frame = Image.new("RGB", (image_width, image_height), rgb_tuple)
                 generated_img = ImageDraw.Draw(image_frame)
-                generated_img.multiline_text((start_x_pos, start_y_pos), string_tuple[image_count][0], font=font_type, fill='black')
+                img_text = string_tuple[image_count][0]
+                generated_img.multiline_text((start_x_pos, start_y_pos), img_text, font=font_type, fill='black')
 
-                save_dir = self.dir_instance.get_save_dir_list()[font_count] + "/" + self.dir_instance.get_font_list()[font_count] + "_" + user_input + "_generated_" + str(image_count + 1) + ".jpeg"
+
+                img_name = self.dir_instance.get_font_list()[font_count] + "_" + user_input + "_generated_" + str(image_count + 1) + ".jpeg"
+                temp_dict = {}
+                temp_dict['text'] = img_text
+                temp_dict['name'] = img_name
+
+                img_name_list.append(temp_dict)
+
+                save_dir = self.dir_instance.get_save_dir_list()[font_count] + "/" + img_name
                 image_frame.save(open(save_dir, "wb"), "JPEG")
 
+
+        return img_name_list
+
+
+    # convert dictionary to json and save

@@ -4,8 +4,8 @@ from bs4 import BeautifulSoup
 import urllib.request
 import urllib.parse
 import random
-import re
 from hanja import hangul
+import hanja
 
 
 class Crawler_Module:
@@ -49,18 +49,16 @@ class Crawler_Module:
             result_list = []
             count = 1
 
-            parse_chars = "[^가-힣0-9a-zA-Z\\s~`!@#$%^&*()-=_+ \\ |[\]{};':\",./<>?]"
+
 
             for item in items:
                 title = self._strip_tag(item.title.get_text(strip=True))
                 description = self._strip_tag(item.description.get_text(strip=True))
 
-                temp_description = re.sub(parse_chars, '', description)
-
                 if count%10 == 0:
-                    temp_string = title + "\n" + temp_description
+                    temp_string = self._remove_useless_chars(title) + "\n" + self._remove_useless_chars(description)
                 else:
-                    temp_string = title + "\n" + temp_description + "\n\n"
+                    temp_string = self._remove_useless_chars(title) + "\n" + self._remove_useless_chars(description) + "\n\n"
 
                 result_list.append(temp_string)
 
@@ -71,8 +69,19 @@ class Crawler_Module:
             return -1
 
     # issue -> convert chinese and korean into korean
-
     # return a parsed crawling results
+
+    def _remove_useless_chars(self, string):
+
+        return_string = ""
+
+        for ch in string:
+            if hangul.is_hangul(ch) or (ch in "\n\t ~`!@#$%^&*()-=_+ \\ |[\]{};':\",./<>?") or ch.isalnum():
+                if hanja.is_hanja(ch):
+                    ch = hanja.translate(ch, 'substitution')
+                return_string += ch
+
+        return return_string
 
     def _strip_tag(self, target_string):
 
@@ -84,6 +93,7 @@ class Crawler_Module:
         target_string = self._tag_converter(target_string, "&lt;", "<")
         target_string = self._tag_converter(target_string, "&gt;", ">")
         target_string = self._tag_converter(target_string, "&nbsp;", " ")
+
 
         return target_string
 
