@@ -19,6 +19,5 @@ if __name__ == "__main__":
     with open(desc_json_path, 'w') as outfile:
         json.dump(data, outfile)
 
-    print(data)
 
     print("\nComplete..!!\n")
