@@ -16,7 +16,7 @@ if __name__ == "__main__":
     random.shuffle(data["train"])
     random.shuffle(data["test"])
 
-    with open(desc_json_path, encoding="uft-8", mode='w') as outfile:
+    with open(desc_json_path, encoding="utf-8", mode='w') as outfile:
         json.dump(data, outfile)
 
 
