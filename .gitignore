@@ -11,3 +11,11 @@
 __pycache__/
 .idea/
 generated_img_data/
+char_dataset/
+multi_line_dataset/
+one_line_dataset/
+word_dataset/
+hgu1_files/
+HanDB_test/
+HanDB_train/
+desc.json
