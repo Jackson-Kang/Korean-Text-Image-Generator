@@ -59,13 +59,15 @@ class Image_Generator:
                     "test": []
                 }
 
-        for count in range(len(data_list)):
+        count = 0
+
+        for data_count in range(len(data_list)):
             # bug.. 나중에 고치기.. len(data_list)만으로 가능해지게..
 
             for font_count in range(len(self.dir_instance.get_font_list())):
                 font_type = ImageFont.truetype(self.dir_instance.get_font_dir() + "/" + self.dir_instance.get_font_list()[font_count],font_size)
                 print("\n" + str(count) + " image generating...")
-                string_tuple = self._string_joiner(data_list[count], self.dir_instance.get_font_list()[font_count], font_size)
+                string_tuple = self._string_joiner(data_list[data_count], self.dir_instance.get_font_list()[font_count], font_size)
                 # (width, height) tuple: string_tuple[image_count][1]
                 image_width = string_tuple[1][0] + 15
                 image_height = string_tuple[1][1] + 15
@@ -92,6 +94,7 @@ class Image_Generator:
                 image_frame.save(open(save_dir + "/" + img_name, "wb"), "JPEG")
                 print("complete!!... \n")
 
+                count += 1
 
 
     def multi_line_img_generator_15(self, string_list, user_input):
