@@ -6,15 +6,6 @@ import HGU1_Generator
 import dir_module
 import string_parser
 
-'''        
-
-    dict = {
-            "one_line
-            "word_list": word_list,
-            "char_list": char_list
-        }
-        
-'''
 
 if __name__ == "__main__":
 
