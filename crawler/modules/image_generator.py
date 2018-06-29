@@ -2,6 +2,7 @@
 
 from PIL import Image, ImageDraw, ImageFont
 import json
+import random
 
 class Image_Generator:
 
@@ -59,42 +60,47 @@ class Image_Generator:
                     "test": []
                 }
 
-        count = 0
+        temp_list = []
+        num_of_font = len(self.dir_instance.get_font_list())
+        data_length = len(data_list)
 
-        for data_count in range(len(data_list)):
-            # bug.. 나중에 고치기.. len(data_list)만으로 가능해지게..
+        for data_count in range(data_length):
+            font_index = random.randrange(num_of_font)
 
-            for font_count in range(len(self.dir_instance.get_font_list())):
-                font_type = ImageFont.truetype(self.dir_instance.get_font_dir() + "/" + self.dir_instance.get_font_list()[font_count],font_size)
-                print("\n" + str(count) + " image generating...")
-                string_tuple = self._string_joiner(data_list[data_count], self.dir_instance.get_font_list()[font_count], font_size)
-                # (width, height) tuple: string_tuple[image_count][1]
-                image_width = string_tuple[1][0] + 15
-                image_height = string_tuple[1][1] + 15
+            font_type = ImageFont.truetype(self.dir_instance.get_font_dir() + "/" + self.dir_instance.get_font_list()[font_index],font_size)
+            print("\n" + str(data_count + 1) + " image generating...")
+            string_tuple = self._string_joiner(data_list[data_count], self.dir_instance.get_font_list()[font_index], font_size)
+            # (width, height) tuple: string_tuple[image_count][1]
 
-                image_frame = Image.new("RGB", (image_width, image_height), self.rgb_tuple)
-                generated_img = ImageDraw.Draw(image_frame)
-                img_text = string_tuple[0]
-                generated_img.multiline_text((self.start_x_pos, self.start_y_pos), img_text, font=font_type, fill='black')
+            image_width = string_tuple[1][0] + 15
+            image_height = string_tuple[1][1] + 15
 
-                img_name = str(count+1) + ".jpeg"
+            image_frame = Image.new("RGB", (image_width, image_height), self.rgb_tuple)
+            generated_img = ImageDraw.Draw(image_frame)
+            img_text = string_tuple[0]
+            generated_img.multiline_text((self.start_x_pos, self.start_y_pos), img_text, font=font_type, fill='black')
 
-                temp_dict = {}
-                temp_dict['text'] = string_tuple[0]
-                temp_dict['name'] = img_name
+            img_name = str(data_count + 1) + ".jpeg"
 
-                if (len(json_data["train"]) <= 70000):
-                    json_data["train"].append(temp_dict)
+            temp_dict = {}
+            temp_dict['text'] = string_tuple[0]
+            temp_dict['name'] = img_name
+            temp_list.append(temp_dict)
+
+            if (data_count == 0) or (data_count % 100) == 0 or (data_count == data_length- 1):
+                if len(json_data["train"]) <= 70000:
+                    json_data["train"].extend(temp_list)
                 else:
-                    json_data["test"].append(temp_dict)
+                    json_data["test"].extend(temp_list)
 
                 with open(label_file_name, "w", encoding='utf-8') as json_file:
                     json.dump(json_data, json_file, indent=4, ensure_ascii=False)
 
-                image_frame.save(open(save_dir + "/" + img_name, "wb"), "JPEG")
-                print("complete!!... \n")
+                temp_list = []
 
-                count += 1
+            image_frame.save(open(save_dir + "/" + img_name, "wb"), "JPEG")
+            print("complete!!... \n")
+
 
 
     def multi_line_img_generator_15(self, string_list, user_input):
