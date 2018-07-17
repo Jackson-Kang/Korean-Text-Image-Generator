@@ -5,11 +5,13 @@
 
 
 # python
-
-
-
 __pycache__/
 .idea/
+
+# python virtualenv
+venv/
+
+# data
 generated_img_data/
 char_dataset/
 multi_line_dataset/
