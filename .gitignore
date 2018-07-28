@@ -1,9 +1,5 @@
 ## ignore files below ##
 
-
-
-
-
 # python
 __pycache__/
 .idea/
@@ -21,3 +17,4 @@ hgu1_files/
 HanDB_test/
 HanDB_train/
 desc.json
+MNIST_data/
