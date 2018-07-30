@@ -20,7 +20,7 @@ img_width = 28
 img_height = 28
 
 window_size = [1, 1]
-hidden_size = 6
+hidden_size =256
 learning_rate = 0.01
 batch_size = 40
 channels = 1
@@ -43,6 +43,7 @@ def data_provider(mode, x, y):
         np.save(mnist_data_path, y)
 
     return y
+
 
 def label_convert(mnist_x, mnist_y):
     # shapes of input that tossed from main function
@@ -70,17 +71,25 @@ def label_convert(mnist_x, mnist_y):
 
     return new_label
 
+
 def remove_label_background(preds, answer):
 
-    reshaped_preds = np.reshape(preds, [-1, num_of_output])
-    reshaped_answer = np.reshape(answer, [-1, num_of_output])
+    reshaped_preds = np.reshape(preds, [batch_size, img_width*img_height*channels, num_of_output])
+    reshaped_answer = np.reshape(answer, [batch_size, img_width*img_height*channels, num_of_output])
 
-    remove_indices = np.where(np.argmax(reshaped_answer, axis=1) == 10)
+    truth_tabel_bg = np.where(reshaped_answer.argmax(axis=2) == 10)
+    truth_tabel_num = np.where(reshaped_answer.argmax(axis=2) != 10)
 
-    reshaped_answer = np.delete(reshaped_answer, remove_indices, axis=0)
-    reshaped_preds = np.delete(reshaped_preds, remove_indices, axis=0)
+    without_bg_answer = reshaped_answer[truth_tabel_num]
+    without_bg_preds = reshaped_preds[truth_tabel_num]
 
-    return reshaped_preds, reshaped_answer
+    with_bg_answer = reshaped_answer[truth_tabel_bg]
+    with_bg_preds = reshaped_preds[truth_tabel_bg]
+
+    return without_bg_preds, without_bg_answer, with_bg_preds, with_bg_answer
+
+
+
 
 def run():
     mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
@@ -94,22 +103,24 @@ def run():
     first_rnn_out, _ = multi_dimensional_rnn_while_loop(rnn_size=hidden_size, input_data=input_layer,
                                                   sh=window_size, scope_n="layer1")
 
+    '''
     second_rnn_out, _ = multi_dimensional_rnn_while_loop(rnn_size=hidden_size, input_data=input_layer,
                                                   sh=window_size, scope_n="layer2", dims=[1])
 
     third_rnn_out, _ = multi_dimensional_rnn_while_loop(rnn_size=hidden_size, input_data=input_layer,
                                                   sh=window_size, scope_n="layer3", dims=[2])
 
-    reversed_input = tf.reverse(input_layer, [1])
+    reversed_input = tf.reverse(third_rnn_out, [1])
 
-    forth_rnn_out, _ = multi_dimensional_rnn_while_loop(rnn_size=hidden_size, input_data=reversed_input,
+    forth_rnn_out, _ = multi_dimensional_rnn_while_loop(rnn_size=hidden_size, input_data=input_layer,
                                                   sh=window_size, scope_n="layer4", dims=[2])
 
     reversed_rnn_out = tf.reverse(forth_rnn_out, [1])
 
     summation = tf.add(tf.add(first_rnn_out, second_rnn_out), tf.add(third_rnn_out, reversed_rnn_out))
+    '''
 
-    output_layer = tf.contrib.slim.fully_connected(inputs=summation, num_outputs=num_of_output, activation_fn=tf.tanh)
+    output_layer = tf.contrib.slim.fully_connected(inputs=first_rnn_out, num_outputs=num_of_output, activation_fn=tf.tanh)
 
     softmax_output = tf.nn.softmax(output_layer)
 
@@ -131,10 +142,11 @@ def run():
     test_x = np.reshape(mnist.test.images,
                         [test_steps, batch_size, img_height, img_width, channels])
 
-    count = 0
 
     list_index = list(range(0, train_steps))
     random.shuffle(list_index)
+
+    writer = tf.summary.FileWriter("./tensorboard_logs/", sess.graph)
 
     for epoch in range(epochs):
 
@@ -144,27 +156,47 @@ def run():
         random.shuffle(list_index)
 
         for i in range(train_steps):
-
-            preds, answer, _, cost = sess.run([softmax_output, y, optimizer, loss], feed_dict={x: train_x[list_index[i]], y: train_y[list_index[i]]})
             
+            preds, answer, _, cost = sess.run([softmax_output, y, optimizer, loss], feed_dict={x: train_x[list_index[i]], y: train_y[list_index[i]]})
+
+            #print(list_index[i])
+
+            cost_summary = tf.summary.scalar("cost", cost)
+
             if i % display_step == 0:
 
-                preds, answer = remove_label_background(preds, answer)
+                test_index = list(range(0, test_steps))
+                random.shuffle(test_index)
 
-                label_step = int(len(preds) / batch_size)
+                removed_background_preds, removed_background_answer, with_bg_preds, with_bg_answer = remove_label_background(preds, answer)
 
-                correct_prediction = tf.equal(tf.argmax(preds, axis=1), tf.argmax(answer, axis=1))
 
-                accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+                removed_correct_prediction = tf.equal(tf.argmax(removed_background_preds, axis=1), tf.argmax(removed_background_answer, axis=1))
+                correct_prediction = tf.equal(tf.argmax(tf.reshape(preds, [batch_size, img_width*img_height*channels, num_of_output]), axis = 2), tf.argmax(tf.reshape(answer, [batch_size, img_width*img_height*channels, num_of_output]), axis = 2))
 
-                total_accuracy = 0.
-                for j in range(label_step):
-                    total_accuracy += accuracy.eval({x: test_x[j], y: test_y[j]}, session=sess)
+                removed_accuracy = tf.reduce_max(tf.reduce_mean(tf.cast(removed_correct_prediction, tf.float32), axis = 0))
+                accuracy = tf.reduce_max(tf.reduce_mean(tf.cast(correct_prediction, tf.float32), axis = 1))
 
-                print("\t\tstep:", '%04d' % i, "cost=", "{:.9f}".format(cost),
-                      "Accuracy: {:.9f}".format(total_accuracy / label_step))
+                bg_correct_prediction = tf.equal(tf.argmax(with_bg_preds, axis=1), tf.argmax(with_bg_answer, axis=1))
+                bg_accuracy =  tf.reduce_mean(tf.cast(bg_correct_prediction, tf.float32), axis = 0)
 
-            count += 1
+                removed_result_accuracy = removed_accuracy.eval({x: test_x[test_index[i % test_steps]], y: test_y[test_index[i % test_steps]]}, session=sess)
+                result_accuracy = accuracy.eval({ x: test_x[test_index[i % test_steps]], y: test_y[test_index[i% test_steps]]}, session = sess)
+                calculated_bg_accuracy = bg_accuracy.eval({x: test_x[test_index[i % test_steps]], y: test_y[test_index[i% test_steps]]}, session = sess)
+
+                non_bg_acc_summary = tf.summary.scalar("Non-BG Acc (per batch)", removed_result_accuracy)
+                bg_acc_summary = tf.summary.scalar("BG Acc (per batch)", calculated_bg_accuracy)
+                overall_acc_summary = tf.summary.scalar("Overall Acc (per image)", result_accuracy)
+
+                merged = tf.summary.merge([cost_summary, non_bg_acc_summary, bg_acc_summary, overall_acc_summary])
+                summary_str = sess.run(merged)
+
+                writer.add_summary(summary_str, i)
+
+                
+                print("  step:", '%04d' % i, "  cost=", "{:.9f}".format(cost),
+                        "  Non-background Accuracy(per batch): ", "{:.9f}".format(removed_result_accuracy), "  Background Accuracy(per batch): ", "{:.9f}".format(calculated_bg_accuracy), "  Overall Accuracy(per image): ", "{:.9f}".format(result_accuracy))
+                
 
     sess.close()
 

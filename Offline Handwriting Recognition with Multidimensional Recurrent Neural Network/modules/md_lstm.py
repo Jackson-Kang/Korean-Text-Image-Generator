@@ -38,7 +38,7 @@ class MultiDimensionalLSTMCell(RNNCell):
         self._forget_bias = forget_bias
         # forget_bias    ->    for forget gate
 
-        self._activation = activation = tf.sigmoid
+        self._activation = activation 
         # activation -> sigmoid로 변경
         # activation default -> hyperbolic tangent function
 
@@ -81,12 +81,17 @@ class MultiDimensionalLSTMCell(RNNCell):
             f2 = ln(f2, scope='f2/')
             o = ln(o, scope='o/')
 
+            '''
             new_c = (c1 * tf.nn.sigmoid(f1 + self._forget_bias) +
                      c2 * tf.nn.sigmoid(f2 + self._forget_bias) + tf.nn.sigmoid(i) *
                      self._activation(j))
+            '''
+
+            new_c = (c1 * f1 + c2 * f2 + i * self._activation(j))
 
             # add layer_normalization in calculation of new hidden state
-            new_h = self._activation(ln(new_c, scope='new_h/')) * tf.nn.sigmoid(o)
+            # new_h = self._activation(ln(new_c, scope='new_h/')) * tf.nn.sigmoid(o)
+            new_h = self._activation(ln(new_c, scope='new_h/')) * o
             new_state = LSTMStateTuple(new_c, new_h)
 
             return new_h, new_state
@@ -244,7 +249,7 @@ def multi_dimensional_rnn_while_loop(rnn_size, input_data, sh, dims=None, scope_
             return tf.less(time_, tf.constant(h_steps * w_steps))
 
         # Run the looped operation
-        num_of_lstm = 25
+        num_of_lstm = 1
 
         result, outputs_ta, states_ta = tf.while_loop(condition, body, [time, outputs_ta, states_ta],
                                                       parallel_iterations= num_of_lstm)
