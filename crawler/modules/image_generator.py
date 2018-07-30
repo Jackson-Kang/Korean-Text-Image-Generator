@@ -57,16 +57,16 @@ class Image_Generator:
             label_file_name = self.dir_instance.get_one_line_dataset_path() + "/" + mode + "_desc.json"
 
 
-        #if self.dir_instance.is_json_exists(mode):
-        #    with open(label_file_name, "r", encoding='utf-8') as json_file:
-        #        json_data = json.load(json_file)
-        #else:
+        if self.dir_instance.is_json_exists(mode):
+            with open(label_file_name, "r", encoding='utf-8') as json_file:
+                json_data = json.load(json_file)
+        else:
 
-        json_data = {
-            "abc":[],
-            "train": [],
-            "test": []
-        }
+            json_data = {
+                "abc":[],
+                "train": [],
+                "test": []
+            }
 
         temp_list = []
         num_of_font = len(self.dir_instance.get_font_list())
