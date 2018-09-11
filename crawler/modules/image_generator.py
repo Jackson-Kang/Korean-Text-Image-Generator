@@ -39,9 +39,9 @@ class Image_Generator:
 
         return (string, (max_text_width, text_height))
 
-    def _list_checker(self, string_list, label_list):
-        for string in string_list:
-            for ch in string:
+    def _list_checker(self, dict_list, label_list):
+        for dict in dict_list:
+            for ch in dict["text"]:
                 if label_list.count(ch) == 0:
                     label_list.append(ch)
 
