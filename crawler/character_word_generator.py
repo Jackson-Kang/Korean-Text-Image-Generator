@@ -27,8 +27,8 @@ if __name__ == "__main__":
     image_generator_instance.generator(data_list=word_list, font_size=50, mode="word")
 
 
-    one_line_string_list = data["one_line_string_list"]
-    image_generator_instance.generator(data_list=one_line_string_list, font_size=25, mode="one_line_string")
+    #one_line_string_list = data["one_line_string_list"]
+    #image_generator_instance.generator(data_list=one_line_string_list, font_size=25, mode="one_line_string")
 
 
 

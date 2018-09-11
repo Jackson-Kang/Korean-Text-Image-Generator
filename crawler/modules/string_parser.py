@@ -12,7 +12,7 @@ def json_file_loader():
 
     dict = {
         "one_line_string_list": one_line_string_list,
-        "word_list": word_list,
+        "word_list": word_list
     }
 
     return dict
@@ -26,12 +26,13 @@ def _word_parser(one_line_string_list):
         temp_word_list = one_line_string.split(' ')
         word_list.extend(temp_word_list)
 
-        if len(word_list) > 110000:
-            break
-
     for word in word_list:
-        if (len(word) >= 2):
+        if (len(word) >= 5 and len(word) <= 7):
             return_list.append(word)
+
+        if(len(return_list)== 100000):
+            break
+    print("word_parser_length", len(return_list))
 
     return return_list
 
@@ -40,19 +41,22 @@ def _one_line_string_parser(json_data):
     one_line_string_list = []
     return_list = []
 
-    for temp_dict in json_data['train']:
-        temp_string = temp_dict['text']
+    temp_list = json_data['train']
+
+    for word in temp_list:
+        temp_string = word["text"]
         temp_string = temp_string.replace('\n\n\n', '\n')
         replaced_string = temp_string.replace('\n\n', '\n')
         temp_one_line_string_list = replaced_string.split('\n')
         one_line_string_list.extend(temp_one_line_string_list)
 
-        if len(one_line_string_list) > 110000:
+        if len(one_line_string_list) > 100000:
             break
 
     for i in range(len(one_line_string_list)):
         if one_line_string_list[i] != '':
             return_list.append(one_line_string_list[i])
 
+    print("length of line string parser", len(return_list))
 
     return return_list

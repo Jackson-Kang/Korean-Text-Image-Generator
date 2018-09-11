@@ -96,17 +96,17 @@ class Image_Generator:
             temp_list.append(temp_dict)
 
             if (data_count == 0) or (data_count % 100) == 0 or (data_count == data_length- 1):
-                if len(json_data["train"]) <= 70000:
+                if len(json_data["train"]) <= 80000:
                     json_data["train"].extend(temp_list)
-                else:
+                elif len(json_data["test"]) <= 100000:
                     json_data["test"].extend(temp_list)
-                
-                json_data["abc"] = _list_checker(temp_dict["text"], json_data["abc"])
+
+                json_data["abc"] = self._list_checker(temp_dict["text"], json_data["abc"])
 
                 with open(label_file_name, "w", encoding='utf-8') as json_file:
                     json.dump(json_data, json_file, indent=4, ensure_ascii=False)
 
-            temp_list = []
+                temp_list = []
 
             image_frame.save(open(save_dir + "/" + img_name, "wb"), "JPEG")
             print("complete!!... \n")
