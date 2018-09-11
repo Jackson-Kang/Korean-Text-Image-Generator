@@ -39,10 +39,11 @@ class Image_Generator:
 
         return (string, (max_text_width, text_height))
 
-    def _list_checker(self, string, label_list):
-        for ch in string:
-            if label_list.count(ch) == 0:
-                label_list.append(ch)
+    def _list_checker(self, string_list, label_list):
+        for string in string_list:
+            for ch in string:
+                if label_list.count(ch) == 0:
+                    label_list.append(ch)
 
         return label_list
 
@@ -101,7 +102,7 @@ class Image_Generator:
                 elif len(json_data["test"]) <= 100000:
                     json_data["test"].extend(temp_list)
 
-                json_data["abc"] = self._list_checker(temp_dict["text"], json_data["abc"])
+                json_data["abc"] = self._list_checker(temp_list, json_data["abc"])
 
                 with open(label_file_name, "w", encoding='utf-8') as json_file:
                     json.dump(json_data, json_file, indent=4, ensure_ascii=False)
