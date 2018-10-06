@@ -6,6 +6,8 @@ import urllib.parse
 import random
 from hanja import hangul
 import hanja
+import enchant
+
 
 
 class Crawler_Module:
@@ -39,6 +41,12 @@ class Crawler_Module:
         # request to API Server
 
         status_code = response.getcode()
+        
+        result_list = []
+
+        if status_code != 200:
+            print("\t\t Error code is", error_code)
+
 
         if status_code == 200:
 
@@ -46,9 +54,7 @@ class Crawler_Module:
             parsed_XML = BeautifulSoup(result_XML, 'lxml-xml')
             items = parsed_XML.find_all('item')
 
-            result_list = []
             count = 1
-
 
 
             for item in items:
@@ -108,7 +114,10 @@ class Crawler_Module:
     def set_user_input(self, user_input):
         self.user_input = user_input
 
-    def find_less_crawled_element(self, string_list):
+    def find_less_crawled_element(self, string_list, mode):
+
+        dictionary = enchant.Dict("en_US")
+        
 
         min_element = []
 
@@ -124,18 +133,30 @@ class Crawler_Module:
 
         min_list = []
 
-        for tuple in sorted_list:
-            if tuple[1] == 1:
-                min_list.append(tuple[0])
 
-        while True:
-            return_val = random.choice(min_list)
-            flag = 0
-            for ch in return_val:
-                if hangul.is_hangul(ch):
-                    flag += 1
-            if flag == len(return_val):
-                break
+        if mode=="English":
+            for tuple in sorted_list:
+                 if tuple[1] == 1 and not(tuple[0]=="")and dictionary.check(tuple[0]):
+                      min_list.append(tuple[0])
+            if not(len(min_list)==0):
+                 return_val = random.choice(min_list)
+            else:
+                 return_val = "Korean"
+
+        elif mode == "Korean":
+            for tuple in sorted_list:
+                 if tuple[1] == 1:
+                      min_list.append(tuple[0])
+
+
+            while True:
+                 return_val = random.choice(min_list)
+                 flag = 0
+                 for ch in return_val:
+                    if hangul.is_hangul(ch):
+                         flag += 1
+                 if flag == len(return_val):
+                    break
 
 
         return return_val

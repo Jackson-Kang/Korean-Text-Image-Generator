@@ -8,8 +8,8 @@ class Image_Generator:
 
     dir_instance = ""
 
-    start_x_pos = 10
-    start_y_pos = 10
+    start_x_pos = 3
+    start_y_pos = 3
     # set position of letters
 
     rgb_tuple = (255, 255, 255)
@@ -36,6 +36,9 @@ class Image_Generator:
         if max_text_width < text_size[0]:
             max_text_width = text_size[0]
 
+        # set image width and height temporary
+        # max_text_width = 100 * 3 - 15
+        text_height = 48 -  15
 
         return (string, (max_text_width, text_height))
 
@@ -76,7 +79,7 @@ class Image_Generator:
         for data_count in range(data_length):
             font_index = random.randrange(num_of_font)
 
-            font_type = ImageFont.truetype(self.dir_instance.get_font_dir() + "/" + self.dir_instance.get_font_list()[font_index],font_size)
+            font_type = ImageFont.truetype(self.dir_instance.get_font_dir() + "/" + self.dir_instance.get_font_list()[font_index], font_size)
             print("\n" + str(data_count + 1) + " image generating...")
             string_tuple = self._string_joiner(data_list[data_count], self.dir_instance.get_font_list()[font_index], font_size)
             # (width, height) tuple: string_tuple[image_count][1]
@@ -96,10 +99,10 @@ class Image_Generator:
             temp_dict['name'] = img_name
             temp_list.append(temp_dict)
 
-            if (data_count == 0) or (data_count % 100) == 0 or (data_count == data_length- 1):
-                if len(json_data["train"]) <= 80000:
+            if (data_count == 0) or (data_count % 100) == 0 or (data_count == 11):
+                if len(json_data["train"]) <= int(data_length * 0.8):
                     json_data["train"].extend(temp_list)
-                elif len(json_data["test"]) <= 100000:
+                elif len(json_data["test"]) <= int(data_length * 0.2):
                     json_data["test"].extend(temp_list)
 
                 json_data["abc"] = self._list_checker(temp_list, json_data["abc"])
@@ -111,8 +114,8 @@ class Image_Generator:
 
             image_frame.save(open(save_dir + "/" + img_name, "wb"), "JPEG")
             print("complete!!... \n")
-
-
+                       
+            
 
     def multi_line_img_generator_15(self, string_list, user_input):
 
