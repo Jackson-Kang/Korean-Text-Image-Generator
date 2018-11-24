@@ -5,7 +5,7 @@ import random
 
 if __name__ == "__main__":
 
-	file_dir_path = '/mnt/ssd512/goodday1478/json/'
+	file_dir_path = '/mnt/hdd640/goodday1478/json/'
 	json_list = os.listdir(file_dir_path)
 
 	json_data = {}
@@ -23,9 +23,8 @@ if __name__ == "__main__":
 			json_data = json.load(json_file)
 
 		output_json["train"].extend(json_data["train"])
-
-	random.shuffle(output_json["train"])
-	# shuffle dataset
+		random.shuffle(output_json["train"])
+		# shuffle dataset
 
 	print("\t\tfinished!")
 

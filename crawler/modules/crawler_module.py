@@ -4,10 +4,8 @@ from bs4 import BeautifulSoup
 import urllib.request
 import urllib.parse
 import random
-from hanja import hangul
-import hanja
 import enchant
-
+import re
 
 
 class Crawler_Module:
@@ -62,6 +60,7 @@ class Crawler_Module:
                 description = self._strip_tag(item.description.get_text(strip=True))
 
                 if count%10 == 0:
+
                     temp_string = self._remove_useless_chars(title) + "\n" + self._remove_useless_chars(description)
                 else:
                     temp_string = self._remove_useless_chars(title) + "\n" + self._remove_useless_chars(description) + "\n\n"
@@ -74,20 +73,16 @@ class Crawler_Module:
             print("Crawler Error: " + str(status_code))
             return -1
 
-    # issue -> convert chinese and korean into korean
     # return a parsed crawling results
 
     def _remove_useless_chars(self, string):
 
-        return_string = ""
+        regex = r'[가-힣A-Za-z0-9`~!@#$%^&*()_=+\'\"{}:;<>,.?/\[\]\n\b\t -]+'
+        return_val = re.findall(regex, string)
 
-        for ch in string:
-            if hangul.is_hangul(ch) or (ch in "\n\t ~`!@#$%^&*()-=_+ \\ |[\]{};':\",./<>?") or ch.isalnum():
-                if hanja.is_hanja(ch):
-                    ch = hanja.translate(ch, 'substitution')
-                return_string += ch
+        return return_val[0]
 
-        return return_string
+
 
     def _strip_tag(self, target_string):
 
@@ -141,23 +136,16 @@ class Crawler_Module:
             if not(len(min_list)==0):
                  return_val = random.choice(min_list)
             else:
-                 return_val = "Korean"
+                 return_val = tuple[0]
 
         elif mode == "Korean":
+            regex = r'[가-힣]+'
             for tuple in sorted_list:
                  if tuple[1] == 1:
                       min_list.append(tuple[0])
+            
 
-
-            while True:
-                 return_val = random.choice(min_list)
-                 flag = 0
-                 for ch in return_val:
-                    if hangul.is_hangul(ch):
-                         flag += 1
-                 if flag == len(return_val):
-                    break
-
-
-        return return_val
+            return_val = random.choice(min_list)
+            return_val = re.findall(regex, return_val)
+        return return_val[0]
 

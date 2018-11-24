@@ -4,7 +4,7 @@ import json
 def json_file_loader():
     json_data = {}
 
-    with open('/mnt/ssd512/goodday1478/json/desc.json', "r", encoding='utf-8') as json_file:
+    with open('/mnt/hdd640/goodday1478/json/desc.json', "r", encoding='utf-8') as json_file:
         json_data = json.load(json_file)
 
     one_line_string_list = _one_line_string_parser(json_data)
@@ -27,7 +27,7 @@ def _word_parser(one_line_string_list):
         word_list.extend(temp_word_list)
 
     for word in word_list:
-        if (len(word) >= 5 and len(word) <= 7):
+        if (len(word) >= 5 and len(word) <= 7)and not(word in return_list):
             return_list.append(word)
 
         if(len(return_list)== 500000):
@@ -38,6 +38,9 @@ def _word_parser(one_line_string_list):
 
 
 def _one_line_string_parser(json_data):
+
+    # limit mimum and maximum length of sentence
+
     one_line_string_list = []
     return_list = []
 
@@ -50,11 +53,12 @@ def _one_line_string_parser(json_data):
         temp_one_line_string_list = replaced_string.split('\n')
         one_line_string_list.extend(temp_one_line_string_list)
 
-        if len(one_line_string_list) > 500000:
+        if len(one_line_string_list) > 1200000:
             break
 
+
     for i in range(len(one_line_string_list)):
-        if one_line_string_list[i] != '':
+        if one_line_string_list[i] != '' and not (one_line_string_list[i] in return_list):
             return_list.append(one_line_string_list[i])
 
     print("length of line string parser", len(return_list))

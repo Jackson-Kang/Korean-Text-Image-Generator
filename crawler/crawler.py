@@ -15,30 +15,31 @@ def json_generate(temp_list, repeat):
 		"test":[]
 	}
 
-	if count==repeat_numb:
 
-		json_data["train"].extend(temp_list)
-		with open("/mnt/ssd512/goodday1478/json/desc"+str(repeat)+".json", "a", encoding='utf-8') as json_file:
+	json_data["train"].extend(temp_list)
+
+	with open("/mnt/hdd640/goodday1478/json/desc"+str(repeat)+".json", "a", encoding='utf-8') as json_file:
 			json.dump(json_data, json_file, indent=4, ensure_ascii=False)
 
 
 if __name__ == "__main__":
 
-	repeat_numb = 100
 
 	crawler = crawler_module.Crawler_Module()
 	count = 0
-	repeat = 51
+	repeat = 1
+	max_repeat_numb = 300
+	store_delimiter = 10
 	pass_count = 0
 	temp_list = []
-	mode = "English"
+	mode = "Korean"
 
 	user_input = input("Search: ")
 
-	while repeat <= 100:
+	while repeat <= max_repeat_numb:
 
+		print("\n\tStep: ", repeat, "th... request...")
 		while True:
-			print("\tStep: ", count, "th... generating...")
 			crawler.set_user_input(user_input)
 			try:
 				result_list = crawler.crawler() 
@@ -48,8 +49,9 @@ if __name__ == "__main__":
 				print("\t\tPass")
 				print("\t\t\t Message:", ex)
 				pass_count += 1
-
-				if pass_count == 20:
+				sleep(60)
+				
+				if pass_count == 3:
 					print("[Error] An error occured!")
 					sys.exit()
 
@@ -60,9 +62,13 @@ if __name__ == "__main__":
 				temp_list.append(string_dict)
 		
 			sleep(random.randrange(0, 10))
-	
-			if count==repeat_numb:
+
+			if count == store_delimiter:
+				print("\t\t  done!")
+				print("\t\tGenerating json files...")
 				json_generate(temp_list, repeat)
+				print("\t\t  done!")
+				temp_list = []
 				break
 
 			count+=1

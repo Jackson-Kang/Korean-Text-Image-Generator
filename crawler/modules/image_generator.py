@@ -76,6 +76,9 @@ class Image_Generator:
         num_of_font = len(self.dir_instance.get_font_list())
         data_length = len(data_list)
 
+        train_length = int(data_length * 0.85)
+	
+
         for data_count in range(data_length):
             font_index = random.randrange(num_of_font)
 
@@ -99,10 +102,10 @@ class Image_Generator:
             temp_dict['name'] = img_name
             temp_list.append(temp_dict)
 
-            if (data_count == 0) or (data_count % 100) == 0 or (data_count == 11):
-                if len(json_data["train"]) <= int(data_length * 0.8):
+            if (data_count == train_length-1 or data_count == data_length-1):
+                if len(json_data["train"]) < train_length:
                     json_data["train"].extend(temp_list)
-                elif len(json_data["test"]) <= int(data_length * 0.2):
+                elif len(json_data["test"]) < data_length:
                     json_data["test"].extend(temp_list)
 
                 json_data["abc"] = self._list_checker(temp_list, json_data["abc"])
